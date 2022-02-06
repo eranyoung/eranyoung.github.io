@@ -1,5 +1,5 @@
 function preload() { 
-    table = loadTable("https://docs.google.com/spreadsheets/d/e/2PACX-1vQ1n-rDAJ7MT1odRbKC2yjjnDesKbG-p9tbKjud22lgkTMhAOp6JzvjcQlugQoWzr_zm-iT7A4VYRa3/pub?gid=580472239&single=true&output=csv", "csv", "header");
+    table = loadTable("https://gist.githubusercontent.com/eranyoung/4734b5f9296c092c253fc1d07e2f8e8a/raw/da087803f3b107ad2357958cd47cb28d71ab81db/cancer(fullSheet)", "csv", "header");
 }
 
 function setup() { 
