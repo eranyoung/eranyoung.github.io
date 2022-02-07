@@ -23,7 +23,7 @@ function draw() {
 
     let ppt = (pageHeight - 110) / 2.3;
 
-    let c = 80;
+    let c = 85;
     textSize(14);
     for(let i = 0; i < numberOfRows; i++) { 
         c+=20;
