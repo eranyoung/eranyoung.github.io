@@ -1,5 +1,5 @@
 function preload() { 
-    table = loadTable("https://gist.githubusercontent.com/eranyoung/4734b5f9296c092c253fc1d07e2f8e8a/raw/da087803f3b107ad2357958cd47cb28d71ab81db/cancer(fullSheet)", "csv", "header");
+    table = loadTable("https://gist.githubusercontent.com/eranyoung/4d6c770200149722d348e1d967760c7c/raw/3ac0bd94cd0e5034dfa7ab358bfcf7b010bb2afa/cancer(rateonlyordered).csv", "csv", "header");
 }
 
 function setup() { 
@@ -23,14 +23,15 @@ function draw() {
 
     let ppt = (pageHeight - 110) / 300;
 
-    let c = 80;
+    let c = 85;
     textSize(14);
     for(let i = 0; i < numberOfRows; i++) { 
-        c+=40;
+        c+=20;
         line(c, pageHeight - 60, c, pageHeight - 40);
         fill(52, 50, 168);
         textAlign(CENTER);
-        text(table.getString(i, 0).substring(0,2).toUpperCase(), c, pageHeight - 20);
+        textSize(12);
+        text(table.getString(i, 0).substring(0,2).toUpperCase(), c, pageHeight - 28);
         let rate = table.getNum(i, 1);
         fill(168, 50, 50);
         rectMode(CORNERS);
@@ -50,7 +51,7 @@ function draw() {
     text("0", 40, pageHeight - 46);
     textSize(20);
     fill(52, 50, 168);
-    text("State", 1100, pageHeight - 5);
+    text("State", 550, pageHeight - 5);
     fill(168, 50, 50);
     rotate(radians(270));
     text("Cancer Rate", -350, 20);
