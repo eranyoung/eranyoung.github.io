@@ -3,7 +3,7 @@ function preload() {
 }
 
 function setup() { 
-    createCanvas(2200, 550);
+    createCanvas(1150, 550);
     numberOfRows = table.getRowCount();
     numberOfColumns = table.getColumnCount();
 }

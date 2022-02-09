@@ -3,7 +3,7 @@ function preload() {
 }
 
 function setup() { 
-    createCanvas(600, 1300);
+    createCanvas(500, 825);
     numberOfRows = table.getRowCount();
     numberOfColumns = table.getColumnCount();
 }
@@ -20,28 +20,28 @@ function draw() {
         textAlign(RIGHT);
         fill(0, 0, 0);
         textSize(13)
-        text(state, 120, r * 120 + 60);
+        text(state, 160, r * 75 + 60);
         for(let c = 0; c < 4; c++) { 
             let value = table.getNum(r, c+1);
             textAlign(LEFT);
             let rgb = getValueBetweenYellowRed(value/max);
             fill(rgb[0], rgb[1] , rgb[2]);
-            rect(c * 120 + 130, r * 120 + 7, 100, 100);
+            rect(c * 75+ 170, r * 75 + 7, 75, 75);
             fill(0,0,0);
             //text("Red: " + rgb[0] + "\nGreen: " + rgb[1] + "\nBlue: " + rgb[2], c * 120 + 140, r * 120 + 30);
             if(r == 9) { 
                 let cName = table.columns[c+1];
                 let columnName = cName.substring(10, cName.length);
                 textAlign(CENTER);
-                text(columnName, c*120+180, r*120+130);
+                text(columnName, c*75+ 210, r*75+95);
             }
         }
     }
 
     textSize(17)
-    text("Age", 360, 1240);
+    text("Age", 310, 800);
     rotate(radians(270));
-    text("State", -650, 20);
+    text("State", -400, 30);
 }
 
 function getValueBetweenYellowRed(value)
