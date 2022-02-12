@@ -54,20 +54,20 @@ function draw() {
     
     let max = 18300;
 
-    max = Math.ceil(max / 100) * 100;
-    sub = max/6;
+    maxCopy = Math.ceil(max / 100) * 100;
+    sub = maxCopy/6;
     textSize(12);
 
     for(let n = 1; n <= 6; n++) { 
-        line(70, n*75, 90, n*75);
+        line(70, n*75-10, 90, n*75-10);
         fill(60, 60, 60)
-        line(70, n*75, 1300, n*75);
+        line(70, n*75-10, 1300, n*75-10);
         fill(0, 0, 0);
-        text(max, 50, n * 75 + 3);
-        max-=sub;
+        text(maxCopy, 50, n * 75 - 7);
+        maxCopy-=sub;
     }
 
-    let ppt = (pageHeight - 110) / 19500;
+    let ppt = max / (pageHeight - 115);
 
     let c = 80;
     let binSize = 550000/20;
@@ -79,11 +79,11 @@ function draw() {
         fill(130, 50, 255);
         textAlign(CENTER);
         textSize(10);
-        text((currBinSize+binSize), c, pageHeight - 28);
+        text(Math.round((currBinSize+binSize)/60), c, pageHeight - 28);
         let rate = Math.round(getAvgOfNums(currBinSize, currBinSize + binSize));
         fill(168, 50, 50);
         rectMode(CORNERS);
-        rect(c-60, pageHeight-50-(rate*ppt), c, pageHeight-50);
+        rect(c-60, pageHeight-50-(rate/ppt), c, pageHeight-50);
         currBinSize += binSize;
     }
 
