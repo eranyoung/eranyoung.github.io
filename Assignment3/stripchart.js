@@ -6,41 +6,22 @@ function preload() {
 var data = [[]];
 
 function process() { 
-    let maxStreamTime = 550000;
-    let bins = 10;
     //text("Processing", 0, 10);
-    for(let i = 0; i < table.getRowCount(); i++) {
-        data[i] = [table.getNum(i, 2), table.getNum(i, 4)];
+    for(let i = 0; i < table.getRowCount()/10; i++) {
+        data[i] = [table.getNum(i, 5), table.getNum(i, 1)];
     }
     data.sort(function(a,b) {
-        return a[0]-b[0];
+        return a[1]-b[1];
     });
 }
 
-function getAvgOfNums(num1, num2) { 
-    let sum = 0, count = 0;
-    for(let i = 0; i < data.length ; i++) { 
-        if(data[i][0] > num1 && data[i][0] < num2) { 
-            sum += data[i][1];
-            count++;
-        }
-    }
-    return sum/count;
-}
+let pageHeight = 550;
 
 function setup() { 
-    createCanvas(1350, 550);
-    numberOfRows = table.getRowCount();
-    numberOfColumns = table.getColumnCount();
-}
-
-let pageHeight = 550;
-let pageWidth = 1350;
-
-function draw() { 
+    createCanvas(1000, 550);
     process();
-    text(data, 0, 20);
-    text(getAvgOfNums(0, 5500), 0, 10);
+    //text(data, 0, 20);
+    //text(getAvgOfNums(0, 5500), 0, 10);
 
     background(220);
     fill(0);
@@ -50,10 +31,10 @@ function draw() {
     line(80, 10, 80, pageHeight - 10);
     line(50, pageHeight - 50, 1300, pageHeight - 50);
     
-    let max = 18300;
+    let max = data[data.length-1][1];
 
     maxCopy = Math.ceil(max / 100) * 100;
-    sub = maxCopy/6;
+    sub = Math.ceil(maxCopy/6);
     textSize(12);
 
     for(let n = 1; n <= 6; n++) { 
@@ -61,36 +42,41 @@ function draw() {
         fill(60, 60, 60)
         line(70, n*75-10, 1300, n*75-10);
         fill(0, 0, 0);
-        text(maxCopy, 50, n * 75 - 7);
+        text(Math.round(maxCopy/60/24/365), 40, n * 75 - 7);
         maxCopy-=sub;
     }
+
+    data.sort(function(a,b) {
+        return a[0]-b[0];
+    });
 
     let ppt = max / (pageHeight - 115);
 
     let c = 80;
-    let binSize = 550000/20;
+    let binSize = Math.ceil(data[data.length-1][0])/7;
     let currBinSize = 0;
     textSize(14);
-    for(let i = 0; i < 20; i++) { 
-        c+=60;
+    let b = 0;
+    for(let i = 0; i < 7; i++) { 
+        c+=120;
         line(c, pageHeight - 60, c, pageHeight - 40);
         fill(130, 50, 255);
         textAlign(CENTER);
         textSize(10);
-        text(Math.round((currBinSize+binSize)/60), c, pageHeight - 28);
-        let rate = Math.round(getAvgOfNums(currBinSize, currBinSize + binSize));
-        fill(168, 50, 50);
-        rectMode(CORNERS);
-        rect(c-60, pageHeight-50-(rate/ppt), c, pageHeight-50);
+        text(Math.round(currBinSize+1) + " - " + Math.round((currBinSize+binSize)), c, pageHeight - 28);
+        while(data[b][0] < currBinSize+binSize) { 
+            circle(random(c-20, c+20), pageHeight - 50 - (data[b][1]/ppt), 5);
+            b++;
+        }
         currBinSize += binSize;
     }
 
     text("0", 40, pageHeight - 46);
     textSize(20);
     fill(130, 50, 255);
-    text("Hours Streamed", 700, pageHeight - 5);
+    text("Followers", 550, pageHeight - 5);
     fill(168, 50, 50);
     rotate(radians(270));
-    text("Average Viewers", -300, 20);
+    text("Watch Time(Years)", -300, 20);
 
 }
