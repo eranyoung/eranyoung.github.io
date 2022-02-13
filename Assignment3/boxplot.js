@@ -60,7 +60,6 @@ function draw() {
     }
 
     let npp = max / (pageHeight - 115);
-    text(min, 20, 20);
 
     line(180, pageHeight - 50 - (min/npp), 220, pageHeight - 50 - (min/npp))
     line(180, pageHeight - 50 - (max/npp), 220, pageHeight - 50 - (max/npp));
@@ -76,6 +75,6 @@ function draw() {
     text("0", 40, pageHeight - 46);
     fill(168, 50, 50);
     rotate(radians(270));
-    text("Peak Viewers", -300, 20);
+    text("Peak Viewers of the Top 100 Twitch Streamers", -450, 17);
 
 }
