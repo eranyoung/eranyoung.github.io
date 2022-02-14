@@ -28,7 +28,7 @@ function setup() {
         fill(60, 60, 60)
         line(70, n*75-10, 1300, n*75-10);
         fill(0, 0, 0);
-        text(Math.round(maxCopy), 40, n * 75 - 7);
+        text(Math.round(maxCopy), 30, n * 75 - 7);
         maxCopy-=sub;
     }
 
@@ -49,10 +49,15 @@ function setup() {
         }
     }
 
+    fill(0,0,0);
+    textSize(12);
     text("0", 40, pageHeight - 46);
     textSize(20);
+    textAlign(CENTER);
+    fill(0,0,0);
+    text("AIDS Death Rate Distribution from 1990 - 1995", pageWidth/2, 20);
     fill(130, 50, 255);
-    text("Year", 550, pageHeight - 5);
+    text("Year", pageWidth/2, pageHeight - 5);
     fill(168, 50, 50);
     rotate(radians(270));
     text("AIDS Death Rate", -300, 20);
