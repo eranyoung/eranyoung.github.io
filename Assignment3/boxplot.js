@@ -25,14 +25,14 @@ function process() {
     lowerq = (median - min) / 2;
 }
 
+let pageHeight = 550;
+let pageWidth = 375;
+
 function setup() { 
-    createCanvas(375, 550);
+    createCanvas(pageWidth, pageHeight);
     numberOfRows = table.getRowCount();
     numberOfColumns = table.getColumnCount();
 }
-
-let pageHeight = 550;
-let pageWidth = 1350;
 
 function draw() { 
     //background(220, 255, 255);
@@ -53,9 +53,8 @@ function draw() {
     for(let n = 1; n <= 6; n++) { 
         line(70, n*75-10, 90, n*75-10);
         fill(60, 60, 60)
-        //line(70, n*75-10, 1300, n*75 -10);
         fill(0, 0, 0);
-        text(maxCopy, 30, n * 75 - 7);
+        text(maxCopy, 47, n * 75 - 7);
         maxCopy-=sub;
     }
 
@@ -72,9 +71,16 @@ function draw() {
     line(200, pageHeight - 50 - (min/npp), 200, pageHeight - 50 - (lowerq/npp));
     textSize(18);
 
+    fill(0,0,0);
+    textSize(12);
     text("0", 40, pageHeight - 46);
+    textSize(20);
+    textAlign(CENTER);
+    fill(0,0,0);
+    text("Peak Viewers of the \nTop 100 Twitch Streamers", pageWidth/2 + 20, pageHeight-30);
     fill(168, 50, 50);
     rotate(radians(270));
-    text("Peak Viewers", -300, 20);a
+    text("Peak Viewers", -300, 20);
+
 
 }

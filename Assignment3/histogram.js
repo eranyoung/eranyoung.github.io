@@ -85,10 +85,15 @@ function draw() {
         currBinSize += binSize;
     }
 
+    fill(0,0,0);
+    textSize(12);
     text("0", 40, pageHeight - 46);
     textSize(20);
+    textAlign(CENTER);
+    fill(0,0,0);
+    text("Hours Streamed on Twitch vs Average Viewers", pageWidth/2, 20);
     fill(130, 50, 255);
-    text("Hours Streamed", 700, pageHeight - 5);
+    text("Hours Streamed", pageWidth/2, pageHeight - 5);
     fill(168, 50, 50);
     rotate(radians(270));
     text("Average Viewers", -300, 20);
