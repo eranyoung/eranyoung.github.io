@@ -64,10 +64,10 @@ function draw() {
     line(180, pageHeight - 50 - (min/npp), 220, pageHeight - 50 - (min/npp))
     line(180, pageHeight - 50 - (max/npp), 220, pageHeight - 50 - (max/npp));
     fill(255, 255, 255);
+    rectMode(CORNERS);
     rect(140, pageHeight - 50 - (upperq/npp), 260,  pageHeight - 50 - (lowerq/npp));
     fill(0, 0, 0)
     line(140, pageHeight - 50 - (median/npp), 260, pageHeight - 50 - (median/npp));
-    rectMode(CORNERS);
     line(200, pageHeight - 50 - (max/npp), 200, pageHeight - 50 - (upperq/npp));
     line(200, pageHeight - 50 - (min/npp), 200, pageHeight - 50 - (lowerq/npp));
     textSize(18);
@@ -75,6 +75,6 @@ function draw() {
     text("0", 40, pageHeight - 46);
     fill(168, 50, 50);
     rotate(radians(270));
-    text("Peak Viewers of the Top 100 Twitch Streamers", -450, 17);
+    text("Peak Viewers", -300, 20);a
 
 }
