@@ -1,0 +1,105 @@
+<!doctype HTML>
+<html>
+<head>
+    <style>
+        .bar {
+            fill: steelblue;
+        }
+    </style>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+<script>
+    var canvasWidth = 600;
+    var canvasHeight = 500;
+    var margin = 200;
+
+    var svg = d3.select("body").append("svg")
+        .attr("width",  canvasWidth)
+        .attr("height", canvasHeight)
+
+    var width = svg.attr("width") - margin;
+    var height = svg.attr("height") - margin;
+
+    svg.append("text")
+        .attr("transform", "translate(100, 0")
+        .attr("x", 85)
+        .attr("y", 50)
+        .attr("font-size", "24px")
+        .text("Car Torque")
+
+    var xScale = d3.scaleBand().range([0, width]).padding(0.4);
+    var yScale = d3.scaleLinear().range([height, 0]);
+
+    var container_g = svg.append("g")
+        .attr("transform",
+            "translate(" + 100 + ", " + 100 + ")");
+
+    d3.csv("https://gist.githubusercontent.com/eranyoung/7a1ece9644f9106624c88ed64aaecc5e/raw/e579b1bf02af525707254d924dca4eecc42d320a/carsmpg.csv").then(data => {
+        yScale.domain([0, d3.max(data, function(d) {
+            return +d.torque;
+        })]);
+
+        var sorted_data = [];
+        sorted_data = data.map(function(d) { return +d.torque; }).sort(d3.ascending);
+        var min = d3.min(sorted_data)
+        var max = d3.max(sorted_data)
+        var median = d3.median(sorted_data)
+        var q1 = d3.quantile(sorted_data, 0.25)
+        var q3 = d3.quantile(sorted_data, 0.75)
+
+        // Display the X-axis
+        container_g.append("g")
+            .attr("transform", "translate(0, " + height + ")")
+            .call(d3.axisBottom(xScale))
+            .append("text")
+            .attr("y", height-265)
+            .attr("x", width-200)
+            .attr("stroke", "black")
+
+        // Display the Y-axis
+        container_g.append("g")
+            .call(d3.axisLeft(yScale).tickFormat(function(d) {
+                return d;
+            }).ticks(10))
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", -5)
+            .attr("x", -100)
+            .attr("dy", "-5.1em")
+            .attr("stroke", "black")
+            .text("Torque")
+
+        container_g.append("line")
+            .attr("x1", width/2)
+            .attr("x2", width/2)
+            .attr("y1", yScale(min))
+            .attr("y2", yScale(max))
+            .attr("stroke", "black")
+
+        container_g
+            .append("rect")
+            .attr("x", (width-100)/2)
+            .attr("y", yScale(q3) )
+            .attr("height", (yScale(q1)-yScale(q3)) )
+            .attr("width", 100 )
+            .attr("stroke", "black")
+            .style("fill", "#69b3a2")
+
+// show median, min and max horizontal lines
+        container_g
+            .selectAll(".line")
+            .data([min, median, max])
+            .enter()
+            .append("line")
+            .attr("x1", (width-100)/2)
+            .attr("x2", (width+100)/2)
+            .attr("y1", function(d){ return(yScale(d))} )
+            .attr("y2", function(d){ return(yScale(d))} )
+            .attr("stroke", "black")
+
+    })
+
+</script>
+</body>
+</html>
