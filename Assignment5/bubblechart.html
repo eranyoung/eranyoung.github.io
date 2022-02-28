@@ -3,7 +3,7 @@
 <head>
     <style>
         .scatter {
-            opacity: 0.6;
+            opacity: 0.7;
         }
     </style>
     <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -39,12 +39,12 @@
         .attr("transform",
             "translate(" + 100 + ", " + 100 + ")");
 
-    d3.csv("health.csv").then(data => {
+    d3.csv("health2.csv").then(data => {
 
         xScale.domain([0, d3.max(data, function(d) {
             return d.increase;
         })]);
-        yScale.domain([0, d3.max(data, function(d) {
+        yScale.domain([10000000, d3.max(data, function(d) {
             return +d.population;
         })]);
         radiusScale.domain([0, d3.max(data, function(d) {
