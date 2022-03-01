@@ -32,7 +32,7 @@ svg {
 }
 
 circle {
-  fill-opacity: .7;
+  fill-opacity: .6;
 }
 
 circle.hidden {
@@ -46,36 +46,39 @@ circle.hidden {
 }
 
 </style>
+<head>
+</head>
 <body>
-<script src="//d3js.org/d3.v4.min.js"></script>
+<script src="//d3js.org/d3.v7.min.js"></script>
 <script>
-
+//Reference Code: https://bl.ocks.org/mbostock/3213173
 var width = 960,
     size = 230,
-    padding = 20;
+    padding = 50;
 
-var x = d3.scaleLinear()
+var xScale = d3.scaleLinear()
     .range([padding / 2, size - padding / 2]);
 
-var y = d3.scaleLinear()
+var yScale = d3.scaleLinear()
     .range([size - padding / 2, padding / 2]);
 
 var xAxis = d3.axisBottom()
-    .scale(x)
+    .scale(xScale)
     .ticks(6);
 
 var yAxis = d3.axisLeft()
-    .scale(y)
+    .scale(yScale)
     .ticks(6);
 
-var color = d3.scaleOrdinal(d3.schemeCategory10);
 
-d3.csv("cars.csv", function(error, data) {
-  if (error) throw error;
+d3.csv("cars.csv").then(data => {
+
+  console.log(data[0]);
 
   var domainByTrait = {},
-      traits = d3.keys(data[0]),
+      traits = Object.keys(data[0]),
       n = traits.length;
+
 
   traits.forEach(function(trait) {
     domainByTrait[trait] = d3.extent(data, function(d) { return +d[trait]; });
@@ -90,22 +93,29 @@ d3.csv("cars.csv", function(error, data) {
     .append("g")
       .attr("transform", "translate(" + padding + "," + padding / 2 + ")");
 
+  svg.append("text") //append title
+      .attr("transform", "translate(100, 0")
+      .attr("x", 35)
+      .attr("y", 0)
+      .attr("font-size", "24px")
+      .text("SPLOM of Various Car Data")
+
   svg.selectAll(".x.axis") //append an x-axis for each trait
       .data(traits)
     .enter().append("g")
       .attr("class", "x axis")
       .attr("transform", function(d, i) { return "translate(" + (n - i - 1) * size + ",0)"; })
-      .each(function(d) { x.domain(domainByTrait[d]); d3.select(this).call(xAxis); });
+      .each(function(d) { xScale.domain(domainByTrait[d]); d3.select(this).call(xAxis); });
 
   svg.selectAll(".y.axis") //append a y axis for each trait
       .data(traits)
     .enter().append("g")
       .attr("class", "y axis")
       .attr("transform", function(d, i) { return "translate(0," + i * size + ")"; })
-      .each(function(d) { y.domain(domainByTrait[d]); d3.select(this).call(yAxis); });
+      .each(function(d) { yScale.domain(domainByTrait[d]); d3.select(this).call(yAxis); });
 
-  var cell = svg.selectAll(".cell") // plot each cell
-      .data(cross(traits, traits))
+  var cell = svg.selectAll(".cell") // appends each cell
+      .data(cross(traits, traits)) //
     .enter().append("g")
       .attr("class", "cell")
       .attr("transform", function(d) { return "translate(" + (n - d.i - 1) * size + "," + d.j * size + ")"; })
@@ -113,16 +123,16 @@ d3.csv("cars.csv", function(error, data) {
 
   // Titles for the diagonal.
   cell.filter(function(d) { return d.i === d.j; }).append("text")
-      .attr("x", padding)
-      .attr("y", padding)
+      .attr("x", padding - 20)
+      .attr("y", padding - 20)
       .attr("dy", ".71em")
       .text(function(d) { return d.x; });
 
   function plot(p) {
     var cell = d3.select(this);
 
-    x.domain(domainByTrait[p.x]);
-    y.domain(domainByTrait[p.y]);
+    xScale.domain(domainByTrait[p.x]);
+    yScale.domain(domainByTrait[p.y]);
 
     cell.append("rect") // the frame for each cell
         .attr("class", "frame")
@@ -131,19 +141,24 @@ d3.csv("cars.csv", function(error, data) {
         .attr("width", size - padding)
         .attr("height", size - padding);
 
-    cell.selectAll("circle")
+    cell.selectAll("circle") //draw each data point
         .data(data)
       .enter().append("circle")
-        .attr("cx", function(d) { return x(d[p.x]); })
-        .attr("cy", function(d) { return y(d[p.y]); })
+        .attr("cx", function(d) { return xScale(d[p.x]); })
+        .attr("cy", function(d) { return yScale(d[p.y]); })
         .attr("r", 4)
+        .style("fill", "purple")
   }
 });
 
 function cross(a, b) { // returns an array containing the points for the two input domains
   var c = [], n = a.length, m = b.length, i, j;
-  for (i = -1; ++i < n;) for (j = -1; ++j < m;) c.push({x: a[i], i: i, y: b[j], j: j});
+  for (i = -1; ++i < n;) 
+    for (j = -1; ++j < m;) 
+      c.push({x: a[i], i: i, y: b[j], j: j});
   return c;
 }
 
 </script>
+</body>
+</html>
