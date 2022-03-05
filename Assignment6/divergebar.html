@@ -1,0 +1,103 @@
+<!doctype HTML>
+<html>
+<head>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="http://colorbrewer2.org/export/colorbrewer.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js" integrity="sha512-wNH6xsp2n8CfB91nrBtfc4sfLwYPBMjSWVUwQOp60AYYXH6i8yCwuKFZ4rgK2i6pQek/b+bSyR7b01/922IBzQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+<script>
+    /*Reference: http://bl.ocks.org/zwang155/5079c689233607dd9bdd28d4e39fb290
+                 https://d3-legend.susielu.com/#usage
+    */
+    var canvasWidth = 650;
+    var canvasHeight = 1000;
+    var margin = 200;
+
+    var svg = d3.select("body").append("svg")
+        .attr("width",  canvasWidth)
+        .attr("height", canvasHeight)
+
+    var width = svg.attr("width") - margin;
+    var height = svg.attr("height") - margin;
+
+    svg.append("text")
+        .attr("transform", "translate(100, 0")
+        .attr("x", 85)
+        .attr("y", 50)
+        .attr("font-size", "24px")
+        .text("Global Warming for US States in Summer")
+
+    var yScale = d3.scaleBand().range([height, 0]);
+    var xScale = d3.scaleLinear().range([0, width]);
+    var colorScale = d3.scaleQuantize().range(["#2c7bb6", "#abd9e9", "#fdae61", "#d7191c"])
+    //from colorbrewer: https://colorbrewer2.org/?type=diverging&scheme=RdYlBu&n=4
+
+    var container_g = svg.append("g")
+        .attr("transform", "translate(" + 100 + ", " + 100 + ")");
+
+    d3.csv("https://raw.githubusercontent.com/washingtonpost/data-2C-beyond-the-limit-usa/main/data/processed/model_state.csv").then(data => {
+
+        data.sort(function(a, b) {
+            return b["Summer"]-a["Summer"]
+        })
+
+        yScale.domain(data.map(function(d){
+            return d.STUSAB;
+        }));
+        xScale.domain([-2.25, 2.25]);
+        colorScale.domain([-0.5, 2]);
+
+        // Display the X-axis
+        container_g.append("g")
+            .attr("transform", "translate(0, " + height + ")")
+            .call(d3.axisBottom(xScale))
+            .append("text")
+            .attr("y", 35)
+            .attr("x", width/2+5)
+            .attr("stroke", "black")
+            .text("Temperature Change")
+
+        // Display the Y-axis
+        container_g.append("g")
+            .attr("transform", "translate(" + width /2 + ", 0)")
+            .call(d3.axisLeft(yScale))
+            .append("text")
+            .attr("transform", "rotate(0)")
+            .attr("y", 40)
+            .attr("x", 10)
+            .attr("dy", "-5.1em")
+            .attr("stroke", "black")
+            .text("State")
+
+        //Draw Bars
+        //Reference for placement of bars: https://observablehq.com/@d3/diverging-bar-chart
+        container_g.selectAll(".bar")
+            .data(data)
+            .enter().append("rect")
+            .attr("class", "bar")
+            .attr("x", function(d) { return xScale(Math.min(0, d.Summer));})
+            .attr("y", function(d) { return yScale(d.STUSAB) + 3; })
+            .attr("width", function(d) { return Math.abs(xScale(d.Summer) - xScale(0))})
+            .attr("height", 10)
+            .attr('fill', function(d) { return colorScale(d.Summer)})
+            .attr('fill-opacity', 0.65)
+
+        container_g.append("g")
+            .attr("class", "legendQuant")
+            .attr("transform", "translate(0, 0)");
+
+        var legend = d3.legendColor()
+            .labelFormat(d3.format(".2f"))
+            .useClass(false)
+            .title("Temperature Change")
+            .titleWidth(100)
+            .scale(colorScale);
+
+        container_g.select(".legendQuant")
+            .call(legend);
+        })
+
+</script>
+</body>
+</html>

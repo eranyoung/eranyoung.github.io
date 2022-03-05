@@ -1,0 +1,109 @@
+<!doctype HTML>
+<html>
+<head>
+    <style>
+        .scatter {
+            opacity: .7;
+            stroke: white;
+            stroke-width: 1px;
+            stroke-opacity: .7;
+        }
+    </style>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="http://colorbrewer2.org/export/colorbrewer.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js" integrity="sha512-wNH6xsp2n8CfB91nrBtfc4sfLwYPBMjSWVUwQOp60AYYXH6i8yCwuKFZ4rgK2i6pQek/b+bSyR7b01/922IBzQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+<script>
+    var canvasWidth = 800;
+    var canvasHeight = 700;
+    var margin = 200;
+
+    var svg = d3.select("body").append("svg")
+        .attr("width",  canvasWidth)
+        .attr("height", canvasHeight)
+
+    var width = svg.attr("width") - margin;
+    var height = svg.attr("height") - margin;
+
+    svg.append("text")
+        .attr("transform", "translate(100, 0")
+        .attr("x", 85)
+        .attr("y", 50)
+        .attr("font-size", "24px")
+        .text("Horsepower vs Torque of Cars")
+
+    var xScale = d3.scaleLinear().range([0, width])
+    var yScale = d3.scaleLinear().range([height, 0]);
+    var colorScale = d3.scaleOrdinal().range(colorbrewer.RdPu[5])
+    //https://colorbrewer2.org/?type=sequential&scheme=RdPu&n=4
+
+    var container_g = svg.append("g")
+        .attr("transform",
+            "translate(" + 100 + ", " + 100 + ")");
+
+    d3.csv("cars.csv").then(data => {
+
+        data.sort(function(a, b) {
+            return a["gears"]-b["gears"]
+        })
+
+        xScale.domain([0, d3.max(data, function(d) {
+            return +d.torque
+        })]);
+        yScale.domain([0, d3.max(data, function(d) {
+            return d.horsepower;
+        })]);
+
+        // Display the X-axis
+        container_g.append("g")
+            .attr("transform", "translate(0, " + height + ")")
+            .call(d3.axisBottom(xScale))
+            .append("text")
+            .attr("y", height-465)
+            .attr("x", width/2)
+            .attr("stroke", "black")
+            .text("Torque")
+
+        // Display the Y-axis
+        container_g.append("g")
+            .call(d3.axisLeft(yScale).tickFormat(function(d) {
+                return d;
+            }).ticks(10))
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", -5)
+            .attr("x", -height/2)
+            .attr("dy", "-5.1em")
+            .attr("stroke", "black")
+            .text("Horsepower")
+
+        //Draw Bars
+        container_g.selectAll("dot")
+            .data(data)
+            .enter().append("circle")
+            .attr("class", "scatter")
+            .attr("cx", function(d) { return xScale(d.torque); })
+            .attr("cy", function(d) { return yScale(d.horsepower); })
+            .attr("r", 10)
+            .style("fill", function(d) { return colorScale(d.gears); })
+
+        container_g.append("g")
+            .attr("class", "legendQuant")
+            .attr("transform", "translate(20, 0)");
+
+        var legend = d3.legendColor()
+            .labelFormat(d3.format(".2f"))
+            .useClass(false)
+            .title("Gears")
+            .titleWidth(100)
+            .scale(colorScale);
+
+        container_g.select(".legendQuant")
+            .call(legend);
+        
+    })
+
+</script>
+</body>
+</html>
