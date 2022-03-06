@@ -1,0 +1,114 @@
+<!doctype HTML>
+<html>
+<head>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="http://colorbrewer2.org/export/colorbrewer.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js" integrity="sha512-wNH6xsp2n8CfB91nrBtfc4sfLwYPBMjSWVUwQOp60AYYXH6i8yCwuKFZ4rgK2i6pQek/b+bSyR7b01/922IBzQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+<script>
+    var canvasWidth = 800;
+    var canvasHeight = 700;
+    var margin = 200;
+
+    var svg = d3.select("body").append("svg")
+        .attr("width",  canvasWidth)
+        .attr("height", canvasHeight)
+
+    var width = svg.attr("width") - margin;
+    var height = svg.attr("height") - margin;
+
+    var line = d3.line()
+        .x(function(d) { return xScale(d.horsepower)})
+        .y(function(d) { return yScale(+d.mpg)})
+
+    svg.append("text")
+        .attr("transform", "translate(100, 0)")
+        .attr("x", 85)
+        .attr("y", 50)
+        .attr("font-size", "24px")
+        .text("Hepatits A Cases from 2000 to 2008")
+
+    var xScale = d3.scaleLinear().range([0, width]);
+    var yScale = d3.scaleLinear().range([height, 0]);
+    var colorScale = d3.scaleOrdinal().range(colorbrewer.Set2[5])
+                        .domain(["CALIFORNIA", "PENNSYLVANIA", "NEW YORK", "TEXAS", "FLORIDA"])
+
+    var container_g = svg.append("g")
+        .attr("transform",
+            "translate(" + 100 + ", " + 100 + ")");
+
+    d3.csv("health3.csv").then(data => {
+
+        //Reference: https://www.d3-graph-gallery.com/graph/line_basic.html
+        
+        data = data.filter(function (a) { return a.disease === "HEPATITIS A"})
+
+        dataNest = Array.from(
+            d3.group(data, d => d.loc), ([key, value]) => ({key, value})
+        );
+
+        xScale.domain(d3.extent(data, function(d) { return +d.year; }));
+        yScale.domain([0, d3.max(data, function(d) {
+            return +d.number;
+        })]);
+        
+        console.log(dataNest)
+
+
+        // Display the Y-axis
+        container_g.append("g")
+            .call(d3.axisLeft(yScale).tickFormat(function(d) {
+                return d;
+            }).ticks(10))
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0)
+            .attr("x", -200)
+            .attr("dy", "-5.1em")
+            .attr("stroke", "black")
+            .text("Number of Cases")
+
+        //Display the X-axis
+        container_g.append("g")
+            .call(d3.axisBottom(xScale).tickFormat(function(d) {
+                return d;
+            }).ticks(10))
+            .attr("transform", "translate(0, 500)")
+            .append("text")
+            .attr("y", 40)
+            .attr("x", width-275)
+            .attr("stroke", "black")
+            .text("Year")
+        
+        for(let i = 0; i < dataNest.length; i++) {
+            container_g.append("path")
+                .datum(dataNest[i].value)
+                .attr("fill", "none")
+                .attr("stroke", function(d) { return colorScale(dataNest[i].key)})
+                .attr("stroke-width", 1.5)
+                .attr("d", d3.line()
+                    .x(function(d) { return xScale(d.year) })
+                    .y(function(d) { return yScale(d.number) })
+            )
+        }
+
+        container_g.append("g")
+            .attr("class", "legendQuant")
+            .attr("transform", "translate(" +  450 + ", 0)");
+
+        var legend = d3.legendColor()
+            .labelFormat(d3.format("1f"))
+            .useClass(false)
+            .title("State")
+            .titleWidth(100)
+            .scale(colorScale);
+
+        container_g.select(".legendQuant")
+            .call(legend);
+        
+    })
+
+</script>
+</body>
+</html>
