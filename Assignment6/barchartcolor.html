@@ -3,7 +3,7 @@
 <head>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="http://colorbrewer2.org/export/colorbrewer.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js" integrity="sha512-wNH6xsp2n8CfB91nrBtfc4sfLwYPBMjSWVUwQOp60AYYXH6i8yCwuKFZ4rgK2i6pQek/b+bSyR7b01/922IBzQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
 </head>
 <body>
 <script>
@@ -36,7 +36,7 @@
         .attr("transform",
             "translate(" + 100 + ", " + 100 + ")");
 
-    d3.csv("https://gist.githubusercontent.com/eranyoung/0693798378985509c2a10ad716eb7ffb/raw/6552b560dae0b7361f990446f76adf5284e92e35/CATestScores.csv").then(data => {
+    d3.csv("testscores.csv").then(data => {
 
         xScale.domain(data.map(function(d){
             return d.year;
