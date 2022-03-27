@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+	<style> /* set the CSS */
+		div.tooltip {
+		  position: absolute;
+		  text-align: center;
+		  padding: 2px;
+		  font: 12px sans-serif;
+		  background: lightsteelblue;
+		  border: 0px;
+		  border-radius: 8px;
+		  pointer-events: none;
+		}
+	</style>
+    <head>
+    	<title>
+    		D3 Node-link Diagram With Force-directed Layout
+    	</title>
+    	<h1 style="margin: 100px">Node-link Diagram With Force-directed Layout</h1>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
+		<script src="index.js"></script>
+    </head>
+    <body style="margin-left: 100px; display: flex; flex-direction: column;">
+        <!-- <script src="index.js"></script> -->
+		<div id="svg-wrapper"></div>
+        <h1 style="font-family:'sans-serif';">Data Source: SOC-FIRM-HI-TECH</h1>
+        <p style="font-family:'sans-serif';">
+        <code style="font-size:1.1em;">
+            @inproceedings{nr,
+                title = {The Network Data Repository with Interactive Graph Analytics and Visualization},
+                author={Ryan A. Rossi and Nesreen K. Ahmed},
+                booktitle = {AAAI},
+                url={https://networkrepository.com},
+                year={2015}
+            }
+        </code>
+        </p>
+        <script>
+            var nodes = []
+            var nodeSet = new Set()
+
+
+            var div = d3.select("body").append("div")
+                .attr("class", "tooltip")
+                .style("opacity", 0);
+
+            var color = () => {
+            const scale = d3.scaleOrdinal(d3.schemeCategory10);
+            return d => scale(d.group);
+            }
+
+            var height = 700
+            var width = 900
+
+            var xScale = d3.scaleLinear().range([0, width]);
+            var yScale = d3.scaleLinear().range([height, 0]);
+
+            d3.csv("./fb-pages-food.csv", function(d) {
+                    return {
+                    source: d['id1'],
+                    target: d['id2'],
+                    value: d['lines']
+                    } 
+                })
+            .then((data) => {
+                const links = data  
+                    links.forEach( d => {
+                    if(!nodeSet.has(d.source)){
+                        nodeSet.add(d.source)
+                        nodes.push({id: d.source})
+                    }
+                    if(!nodeSet.has(d.target)){
+                        nodeSet.add(d.target)
+                        nodes.push({id: d.target})
+                    }
+                    });
+
+            const scale = d3.scaleOrdinal(d3.schemeCategory10);
+
+            const simulation = d3.forceSimulation(nodes)
+                .force("link", d3.forceLink(links).id(d => d.id))
+                .force("charge", d3.forceManyBody())
+                .force("center", d3.forceCenter(width*2, height*2)) //scaling to  make sure all nodes fit in frame
+
+            const svg = d3.select("#svg-wrapper")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .attr("viewBox", [0, 0, width, height])
+
+            const link = svg.append("g")
+                .attr("stroke", "#999")
+                .attr("stroke-opacity", 0.6)
+                .selectAll("line")
+                .data(links)
+                .join("line")
+                .attr("stroke-width", d => Math.sqrt(d.value));
+
+            const node = svg.append("g")
+                .attr("stroke", "#fff")
+                .attr("stroke-width", 1.5)
+                .selectAll("circle")
+                .data(nodes)
+                .join("circle")
+                .attr("r", 6)
+                .attr("fill", function(d){
+                    return scale(d.id)
+                })
+                .on("mouseover", function(event,d) {
+                    div.transition().duration(200).style("opacity", .9);
+                    div.html("ID: " + d.id)
+                        .style("left", (event.pageX + 30) + "px")
+                        .style("top", (event.pageY - 28) + "px");
+                })
+
+            node.append("title")
+                .text(d => d.id);
+
+            simulation.on("tick", () => {
+                link
+                    .attr("x1", d => d.source.x/4) //scaling to  make sure all nodes fit in frame
+                    .attr("y1", d => d.source.y/4)
+                    .attr("x2", d => d.target.x/4)
+                    .attr("y2", d => d.target.y/4);
+
+                node
+                    .attr("cx", d => d.x/4)
+                    .attr("cy", d => d.y/4);
+            });
+
+            })
+        </script>
+    </body>
+</html>

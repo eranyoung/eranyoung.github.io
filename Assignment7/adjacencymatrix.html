@@ -1,0 +1,122 @@
+<html>
+<style>
+
+    .chart {
+        background: #eee;
+    }
+
+    .chart text {
+        font: 10px Arial;
+        fill: #000;
+    }
+
+    .tooltip {
+        position: absolute;
+        text-align: center;
+        padding: 5px;
+        font: 12px sans-serif;
+        background: lightsteelblue;
+        border-radius: 6px;
+    }
+
+</style>
+<head>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <h1> Adjacency Matrix </h1>
+</head>
+<body>
+    <svg class="chart" width="1200" height="1200"></svg>
+    <script src="d3-adjacency%20matrix.js"></script>
+
+    <script> 
+        let margin = {left: 36, right: 0, top: 36, bottom: 0},
+            svg = d3.select('svg'),
+            width = svg.attr('width') - margin.left - margin.right,
+            height = svg.attr('height') - margin.top - margin.bottom
+
+        let tooltip = d3.select('body').append('div')
+            .attr('class', 'tooltip')
+            .style('opacity', 0)
+
+        let xScale = d3.scaleBand().range([margin.left, margin.left + width]).padding(0.05),
+            yScale = d3.scaleBand().range([margin.top, margin.top + height]).padding(0.05)
+
+        let hashNode = (x, y) => x + ' -> ' + y
+
+        d3.csv('fb-pages-food-randnums.csv', d => {
+            return {
+                source: +d['id1'],
+                target: +d['id2'],
+                value: +d['lines']
+            }
+        }).then(dataset => {
+            let nodeSet = new Set()
+            dataset.forEach(elem => {
+                nodeSet.add(elem.source)
+                nodeSet.add(elem.target)
+            })
+
+            var colorScale = d3.scaleSequential(d3.interpolate("white", "red")).domain([1,100]);
+
+            let nodes = []
+            nodeSet.forEach(elem => nodes.push(elem))
+
+            let grids = new Map()
+            for (let src of nodes) {
+                for (let tgt of nodes) {
+                    grids.set(hashNode(src, tgt), {x: tgt, y: src, value: 0})
+                }
+            }
+            dataset.forEach(elem => {
+                grids.get(hashNode(elem.source, elem.target)).value = elem.value
+                grids.get(hashNode(elem.target, elem.source)).value = elem.value
+            })
+
+            xScale.domain(nodes)
+            yScale.domain(nodes)
+
+            svg.selectAll('g')
+                .data(nodes)
+                .enter()
+                .append('text')
+                .attr('text-anchor', 'middle')
+                .attr('x', margin.left / 2)
+                .attr('y', d => yScale(d) + 4)
+                .text(d => d)
+
+            svg.selectAll('g')
+                .data(nodes)
+                .enter()
+                .append('text')
+                .attr('text-anchor', 'middle')
+                .attr('x', d => xScale(d))
+                .attr('y', margin.top / 2)
+                .text(d => d)
+
+            svg.selectAll('rect')
+                .data(grids)
+                .enter()
+                .append('rect')
+                .attr('x', d => xScale(d[1].x) - xScale.bandwidth() / 2)
+                .attr('y', d => yScale(d[1].y) - xScale.bandwidth() / 2)
+                .attr('width', xScale.bandwidth())
+                .attr('height', yScale.bandwidth())
+                .attr('stroke', 'gray')
+                .attr('stroke-width', 0.5)
+                .attr('fill', function(d) { return colorScale(d[1].value) })
+                .on('mouseover', function(event, d) {
+                    svg.selectAll('rect')
+                        .attr('stroke-width', g => (g[1].x === d[1].x || g[1].y === d[1].y) ? 2 : 0.5)
+                    tooltip.transition().duration(200).style('opacity', 0.9)
+                    tooltip.html('link: ' + d[0])
+                        .style('left', (event.pageX + 10) + 'px')
+                        .style('top', (event.pageY - 10) + 'px')
+                })
+                .on('mouseout', function() {
+                    svg.selectAll('rect').attr('stroke-width', 0.5)
+                    tooltip.transition().duration(600).style('opacity', 0)
+                })
+        })
+    </script>
+</body>
+</html>
