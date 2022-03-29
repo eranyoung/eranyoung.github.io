@@ -10,15 +10,21 @@
 		  border-radius: 8px;
 		  pointer-events: none;
 		}
+
+        .links path {
+            stroke: #999;
+            stroke-opacity: 0.5;
+            fill: none;
+        }
 	</style>
     <head>
     	<title>
-    		D3 Node-link Diagram With Force-directed Layout
+    		D3 Node-link Diagram With Force-directed Layout and Edge Bundling
     	</title>
-    	<h1 style="margin: 100px">Node-link Diagram With Force-directed Layout</h1>
+    	<h1 style="margin: 100px">Node-link Diagram With Force-directed Layout and Edge Bundling</h1>
         <script src="https://d3js.org/d3.v7.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
-		<script src="index.js"></script>
+		    <script src="https://cdn.rawgit.com/upphiminn/d3.ForceBundle/2b406b8567fcad0a6c2922c84cd4bceb0c374bc5/d3-ForceEdgeBundling.js"></script>
     </head>
     <body style="margin-left: 100px; display: flex; flex-direction: column;">
         <!-- <script src="index.js"></script> -->
@@ -26,13 +32,13 @@
         <h1 style="font-family:'sans-serif';">Data Source: SOC-DOLPHINS</h1>
         <p style="font-family:'sans-serif';">
         <code style="font-size:1.1em;">
-            @inproceedings{nr,
-                title={The Network Data Repository with Interactive Graph Analytics and Visualization},
-                author={Ryan A. Rossi and Nesreen K. Ahmed},
-                booktitle={AAAI},
-                url={https://networkrepository.com},
-                year={2015}
-           }
+          @inproceedings{nr,
+            title={The Network Data Repository with Interactive Graph Analytics and Visualization},
+            author={Ryan A. Rossi and Nesreen K. Ahmed},
+            booktitle={AAAI},
+            url={https://networkrepository.com},
+            year={2015}
+       }
         </code>
         </p>
         <script>
@@ -63,8 +69,8 @@
                     } 
                 })
             .then((data) => {
-                const links = data  
-                    links.forEach( d => {
+                const linkData = data  
+                    linkData.forEach( d => {
                     if(!nodeSet.has(d.source)){
                         nodeSet.add(d.source)
                         nodes.push({id: d.source})
@@ -78,7 +84,7 @@
             const scale = d3.scaleOrdinal(d3.schemeCategory10);
 
             const simulation = d3.forceSimulation(nodes)
-                .force("link", d3.forceLink(links).id(d => d.id))
+                .force("link", d3.forceLink(linkData).id(d => d.id))
                 .force("charge", d3.forceManyBody())
                 .force("center", d3.forceCenter(width/2, height/2)) //scaling to  make sure all nodes fit in frame
 
@@ -88,13 +94,8 @@
                 .attr("height", height)
                 .attr("viewBox", [0, 0, width, height])
 
-            const link = svg.append("g")
-                .attr("stroke", "#999")
-                .attr("stroke-opacity", 0.6)
-                .selectAll("line")
-                .data(links)
-                .join("line")
-                .attr("stroke-width", d => Math.sqrt(d.value));
+            var links = svg.append("g")
+                .attr("class", "links");
 
             const node = svg.append("g")
                 .attr("stroke", "#fff")
@@ -116,19 +117,41 @@
             node.append("title")
                 .text(d => d.id);
 
-            simulation.on("tick", () => {
-                link
-                    .attr("x1", d => d.source.x) //scaling to  make sure all nodes fit in frame
-                    .attr("y1", d => d.source.y)
-                    .attr("x2", d => d.target.x)
-                    .attr("y2", d => d.target.y);
+            var d3line = d3.line()
+                .x(function(d){return d.x;})
+                .y(function(d){return d.y;});
+            
+            simulation
+                .nodes(nodes)
+                .on("tick", ticked);
 
+            simulation.force("link")
+                .links(linkData);
+
+            function ticked() {
                 node
-                    .attr("cx", d => d.x)
-                    .attr("cy", d => d.y);
-            });
+                    .attr("cx", function(d) { return d.x; })
+                    .attr("cy", function(d) { return d.y; });
 
+                //Run FDEB on all the links
+                var fbundling = d3.ForceEdgeBundling()
+                    .step_size(0.2)
+                    .compatibility_threshold(0.2)
+                    .nodes(simulation.nodes())
+                    .edges(simulation.force('link').links().map(function(edge) {
+                        return {
+                            source: simulation.nodes().indexOf(edge.source),
+                            target: simulation.nodes().indexOf(edge.target)
+                        }
+                    }));
+
+                var link = links.selectAll('path')
+                    .data(fbundling());
+
+                link.exit().remove();
+                link.merge(link.enter().append('path'))
+                    .attr('d', d3line);
+            }
             })
         </script>
     </body>
-</html>
