@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+	  .country{ 
+		  fill: white;
+		  border: black;
+	  }
+	  .tooltip {   
+		position: absolute;         
+		text-align: left;         
+		width: 140px;                    
+		height: 30px;                   
+		padding: 2px;               
+		font: 12px sans-serif;      
+		background: lightsteelblue; 
+		border: 0px;        
+		border-radius: 8px;         
+		pointer-events: none;           
+	}
+  </style>
+</head>
+<body>
+	<h1>US Choropleth Population Map </h1>
+	<div id="map"> </div>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+	d3.json('world.json').then(data => {
+
+		const jsondata = data.features
+		console.log(jsondata)
+		
+		const width = 960;
+		const height = 500;
+		const svg = d3.select('#map')
+			.append('svg')
+			.attr('width', width)
+			.attr('height', height);
+
+		var Tooltip = d3.select('body')
+			.append("div")
+			.attr("class", "tooltip")
+			.style("opacity", 1)
+			.style("background-color", "white")
+			.style("border", "solid")
+			.style("border-width", "2px")
+			.style("border-radius", "5px")
+			.style("padding", "5px")
+
+		var projection = d3.geoMercator()
+            .scale(70)
+            .translate([width / 2, height / 2]);
+
+		const path = d3.geoPath().projection(projection);
+
+		var mouseover = function(d) {
+			Tooltip.style("opacity", 1)
+		}
+		var mousemove = function(d, i) {
+			const name = i.properties.name
+			var attrs = d.srcElement.attributes;
+			Tooltip
+				.html("Country: " + name + "<br>Population: " + attrs['population'].value)
+				.style("left", (d.pageX) + "px")
+				.style("top", (d.pageY - 28) + "px")
+		}
+		var mouseleave = function(d) {
+			Tooltip.style("opacity", 0)
+		}
+		
+		d3.csv('countrypop.csv').then(data => {
+			svg.append('g')
+			.selectAll('path')
+			.data(jsondata)
+			.enter()
+			.append('path')
+			.attr('d', path)
+			.attr('class', 'country')
+			.attr('population', d => {
+				const name = d.properties.name;
+				for(let i = 0; i < data.length; i ++){
+					if(data[i].country === name) {
+						console.log(data[i].country)
+						return data[i].population
+					}
+				} 
+			})
+			.attr('stroke', 'black')
+			.on("mouseover", mouseover)
+			.on("mousemove", mousemove)
+			.on("mouseleave", mouseleave)
+			
+
+		});
+	});
+</script>
+</body>
+</html>
