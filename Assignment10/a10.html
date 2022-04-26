@@ -1,20 +1,50 @@
 <html>
 <head>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
 </head>
 <body>
 <h1 class="text-center font-bold text-4xl pb-10 ">Assignment 10</h1>
+    <h2 class="text-center font-semibold text-3xl pb-5">C Spec</h2>
     <div class="pl-3 pr-3 flex gap-x-4 w-full"> 
-        <div class="w-1/2 h-1/6"> 
+        <div class="w-1/2 h-full"> 
             <h2 class="text-center font-semibold">Bad Chart</h2>
             <img class="border-4 w-fit h-fit" src="piechart.jpg"></img>
+            <h3 class="text-center font-semibold">The 3D-ness of this chart does not add anything to the chart and it does not convey the data in any effective way. Furthermore
+                there are slices which have a different height to highlight those data points but it makes it confusing since the way the data is represented by volume does not stay consistent
+                Also pie charts are bad and 3D pie charts are even worse for helping people accurately read data points as it is encoded in either area or volume.
+            </h3>
         </div>
-        <div class="w-1/2 h-1/6">
+        <div class="w-1/2 h-full">
             <h2 class="text-center font-semibold">Good Chart</h2>
             <img class="border-4 w-fit h-fit" src="goodbarchart.jpg"></img>
+            <h3 class="text-center font-semibold">Bar charts are far more effective for visualizing data in general. It is very easy to tell what a value is since it is simply
+                encoded as the length of the bar. Furthermore, there is no need for extraneous use of color as the categories are clearly seperated without them. Instead
+                color is used here to highlight an important value.</h3>
         </div>
     </div>
-
-
+    <h2 class="text-center font-semibold text-3xl pt-10 pb-5">A Spec</h2>
+    <div class="pl-3 pr-3 flex gap-x-4 w-full h-screen">
+        <div class="w-1/2 h-full">
+            <div id="badChart" class="h-full">
+            </div>
+            <h3 class="text-center font-semibold">This line chart does not contain axis labels which makes it not as clear as to what is being displayed
+                It must be inferred from the title. Furthermore, the y-axis is scaled in a way which makes it seem as if the values have not changed very much, but still remain
+                very high. Finally, there is no color used and no labels given to each line so there is no way to tell what which line represents and makes it harder to 
+                trace the lines
+            </h3>
+        </div>
+        <div class="w-1/2 h-full">
+            <div id="goodChart" class="h-full">
+            </div>
+            <h3 class="text-center font-semibold">This line chart contains axis labels in addition to the title making it very clear what is being compared.
+                Furthermore, the y-axis scale is linear so it does not skew the data in anyway and it is very easy to tell that there has been a significant drop
+                in cases since 2000. Lastly, each line has a unique color as well as a legend so we know which state each line represents. 
+            </h3>
+        </div>
+    </div>
+    <script src="./linechartGood.js"></script>
+    <script src="./linechartBad.js"></script>
 </body>
 </html>
